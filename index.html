@@ -18,66 +18,72 @@ body{
     text-align:center;
 }
 
-/* EMOJI BAR (ALWAYS ON TOP) */
-#emojiBar{
+/* TOP MENU (GAMES NOW AT TOP) */
+#topMenu{
     position:fixed;
     top:0;
+    width:100%;
+    background:#001a66;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding:10px;
+    z-index:10000;
+}
+
+#topMenu button{
+    background:#00aaff;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    color:white;
+    font-size:16px;
+}
+
+/* EMOJI BAR (UNDER TOP MENU) */
+#emojiBar{
+    position:fixed;
+    top:60px;
     width:100%;
     background:#003cff;
     padding:10px;
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:5px;
+    gap:6px;
     z-index:9999;
 }
 
 .emoji-btn{
-    background:white;
+    background:#00aaff;
     border:none;
-    padding:6px 8px;
-    font-size:18px;
-    border-radius:6px;
+    padding:10px 12px;
+    font-size:20px;
+    border-radius:10px;
+    color:white;
 }
 
-/* CURSOR (ALWAYS TOP) */
+/* CURSOR */
 #cursor{
     position:fixed;
     pointer-events:none;
-    font-size:26px;
+    font-size:28px;
     transform:translate(-50%,-50%);
     z-index:10000;
 }
 
-/* MENU */
-.menu{
-    margin-top:140px;
-}
-
-.menu button{
-    display:block;
-    margin:10px auto;
-    padding:18px 35px;
-    font-size:20px;
-    background:#00aaff;
-    border:none;
-    border-radius:12px;
-    color:white;
-}
-
-/* GAME WINDOWS (DO NOT COVER EMOJI BAR) */
+/* GAME WINDOWS */
 .game{
     display:none;
     position:fixed;
-    top:80px;          /* leaves space for emoji bar */
+    top:120px;
     left:0;
     width:100%;
-    height:calc(100% - 80px);
+    height:calc(100% - 120px);
     background:rgba(0,0,0,0.95);
     justify-content:center;
     align-items:center;
     flex-direction:column;
-    z-index:1;
 }
 
 /* TIC TAC TOE */
@@ -95,29 +101,27 @@ body{
 .cookie{
     font-size:90px;
 }
-
-button,input{
-    cursor:none !important;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- EMOJIS -->
+<!-- TOP MENU -->
+<div id="topMenu">
+    <button onclick="openGame('hangman')">🧠 Hangman</button>
+    <button onclick="openGame('wordle')">🟩 Wordle</button>
+    <button onclick="openGame('ttt')">❌ Tic Tac Toe</button>
+    <button onclick="openGame('cookie')">🍪 Cookie</button>
+</div>
+
+<!-- EMOJI BAR -->
 <div id="emojiBar"></div>
 
 <!-- CURSOR -->
 <div id="cursor">😀</div>
 
-<!-- MENU -->
-<div class="menu">
-    <button onclick="openGame('hangman')">🧠 HANGMAN</button>
-    <button onclick="openGame('wordle')">🟩 WORDLE</button>
-    <button onclick="openGame('ttt')">❌ TIC TAC TOE</button>
-    <button onclick="openGame('cookie')">🍪 COOKIE CLICKER</button>
-</div>
+<!-- MENU GAMES -->
+<div class="menu"></div>
 
 <!-- HANGMAN -->
 <div class="game" id="hangman">
@@ -144,7 +148,7 @@ button,input{
 <button onclick="closeGame()">BACK</button>
 </div>
 
-<!-- COOKIE CLICKER -->
+<!-- COOKIE -->
 <div class="game" id="cookie">
 <h1>🍪 COOKIE CLICKER</h1>
 <div class="cookie" onclick="addCookie()">🍪</div>
@@ -155,19 +159,21 @@ button,input{
 <script>
 
 /* ======================
-   40 EMOJIS
+   90 EMOJIS (50+ ADDED)
 ====================== */
 
 const emojis=[
-"😀","😎","🔥","⚡","💎",
-"🎮","🚀","👑","🐱","🦄",
-"🍕","🌈","🎉","💥","🐸",
-"🧠","👾","🎲","🌀","💙",
+"😀","😎","🔥","⚡","💎","🎮","🚀","👑","🐱","🦄",
+"🍕","🌈","🎉","💥","🐸","🧠","👾","🎲","🌀","💙",
+"😺","😈","🤡","👽","🤠","🥳","😴","🤯","🥶","😡",
+"💩","👀","🦁","🐯","🐧","🐬","🦋","🌵","🍀","🍩",
 
-"😺","😈","🤡","👽","🤠",
-"🥳","😴","🤯","🥶","😡",
-"💩","👀","🦁","🐯","🐧",
-"🐬","🦋","🌵","🍀","🍩"
+// NEW 50+
+"🍔","🍟","🍿","🥤","🍓","🍒","🍑","🍍","🥝","🍉",
+"🍇","🥕","🌽","🍪","🍫","🍬","🍭","🍰","🎂","🧁",
+"⚽","🏀","🏈","🎾","🏓","🏸","🎯","🎳","🎮","🎤",
+"🎧","🎹","🥁","🎸","🚗","✈️","🚀","🛸","🏆","🥇",
+"💡","🔑","🧲","📱","💻","🖥️","🕹️","📦","🧩","🧸"
 ];
 
 let currentEmoji="😀";
@@ -196,24 +202,29 @@ function openGame(id){
     .forEach(g=>g.style.display="none");
 
     document.getElementById(id).style.display="flex";
+
+    if(id==="hangman") renderHangman();
 }
 
-function closeGame(){
-    document.querySelectorAll(".game")
-    .forEach(g=>g.style.display="none");
-}
-
-/* HANGMAN */
+/* HANGMAN FIXED */
 const secret="🍎🍌🍇";
 let guessed=[];
 
-function guess(){
-    let v=document.getElementById("letter").value;
-    guessed.push(v);
-
+function renderHangman(){
     document.getElementById("word").innerHTML=
     secret.split("").map(c=>guessed.includes(c)?c:"❓").join(" ");
 }
+
+function guess(){
+    let v=document.getElementById("letter").value;
+    if(!v) return;
+
+    guessed.push(v);
+    document.getElementById("letter").value="";
+    renderHangman();
+}
+
+renderHangman();
 
 /* WORDLE */
 const target=["🍎","🍌","🍇","🍓","🍉"];
@@ -272,6 +283,11 @@ function addCookie(){
     document.getElementById("count").innerText=cookies+" 🍪";
 }
 
+/* CLOSE */
+function closeGame(){
+    document.querySelectorAll(".game")
+    .forEach(g=>g.style.display="none");
+}
 </script>
 
 </body>
