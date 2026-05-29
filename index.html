@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMOJI GAME HUB</title>
+
+<style>
+*{
+    cursor:none !important;
+}
+
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+/* EMOJI BAR (ALWAYS ON TOP) */
+#emojiBar{
+    position:fixed;
+    top:0;
+    width:100%;
+    background:#003cff;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:5px;
+    z-index:9999;
+}
+
+.emoji-btn{
+    background:white;
+    border:none;
+    padding:6px 8px;
+    font-size:18px;
+    border-radius:6px;
+}
+
+/* CURSOR (ALWAYS TOP) */
+#cursor{
+    position:fixed;
+    pointer-events:none;
+    font-size:26px;
+    transform:translate(-50%,-50%);
+    z-index:10000;
+}
+
+/* MENU */
+.menu{
+    margin-top:140px;
+}
+
+.menu button{
+    display:block;
+    margin:10px auto;
+    padding:18px 35px;
+    font-size:20px;
+    background:#00aaff;
+    border:none;
+    border-radius:12px;
+    color:white;
+}
+
+/* GAME WINDOWS (DO NOT COVER EMOJI BAR) */
+.game{
+    display:none;
+    position:fixed;
+    top:80px;          /* leaves space for emoji bar */
+    left:0;
+    width:100%;
+    height:calc(100% - 80px);
+    background:rgba(0,0,0,0.95);
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:1;
+}
+
+/* TIC TAC TOE */
+.cell{
+    width:60px;
+    height:60px;
+    background:#333;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+}
+
+/* COOKIE */
+.cookie{
+    font-size:90px;
+}
+
+button,input{
+    cursor:none !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- EMOJIS -->
+<div id="emojiBar"></div>
+
+<!-- CURSOR -->
+<div id="cursor">😀</div>
+
+<!-- MENU -->
+<div class="menu">
+    <button onclick="openGame('hangman')">🧠 HANGMAN</button>
+    <button onclick="openGame('wordle')">🟩 WORDLE</button>
+    <button onclick="openGame('ttt')">❌ TIC TAC TOE</button>
+    <button onclick="openGame('cookie')">🍪 COOKIE CLICKER</button>
+</div>
+
+<!-- HANGMAN -->
+<div class="game" id="hangman">
+<h1>🧠 HANGMAN</h1>
+<p id="word"></p>
+<input id="letter" maxlength="1">
+<button onclick="guess()">GUESS</button>
+<button onclick="closeGame()">BACK</button>
+</div>
+
+<!-- WORDLE -->
+<div class="game" id="wordle">
+<h1>🟩 WORDLE</h1>
+<input id="guessWord" maxlength="5">
+<button onclick="checkWord()">ENTER</button>
+<div id="wordleGrid"></div>
+<button onclick="closeGame()">BACK</button>
+</div>
+
+<!-- TIC TAC TOE -->
+<div class="game" id="ttt">
+<h1>❌ TIC TAC TOE ⭕</h1>
+<div id="tttBoard" style="display:grid;grid-template-columns:repeat(3,60px);gap:5px;"></div>
+<button onclick="closeGame()">BACK</button>
+</div>
+
+<!-- COOKIE CLICKER -->
+<div class="game" id="cookie">
+<h1>🍪 COOKIE CLICKER</h1>
+<div class="cookie" onclick="addCookie()">🍪</div>
+<h2 id="count">0 🍪</h2>
+<button onclick="closeGame()">BACK</button>
+</div>
+
+<script>
+
+/* ======================
+   40 EMOJIS
+====================== */
+
+const emojis=[
+"😀","😎","🔥","⚡","💎",
+"🎮","🚀","👑","🐱","🦄",
+"🍕","🌈","🎉","💥","🐸",
+"🧠","👾","🎲","🌀","💙",
+
+"😺","😈","🤡","👽","🤠",
+"🥳","😴","🤯","🥶","😡",
+"💩","👀","🦁","🐯","🐧",
+"🐬","🦋","🌵","🍀","🍩"
+];
+
+let currentEmoji="😀";
+
+const bar=document.getElementById("emojiBar");
+
+emojis.forEach(e=>{
+    const b=document.createElement("button");
+    b.className="emoji-btn";
+    b.innerHTML=e;
+    b.onclick=()=>currentEmoji=e;
+    bar.appendChild(b);
+});
+
+/* CURSOR */
+document.addEventListener("mousemove",(e)=>{
+    const c=document.getElementById("cursor");
+    c.innerHTML=currentEmoji;
+    c.style.left=e.clientX+"px";
+    c.style.top=e.clientY+"px";
+});
+
+/* GAME SYSTEM */
+function openGame(id){
+    document.querySelectorAll(".game")
+    .forEach(g=>g.style.display="none");
+
+    document.getElementById(id).style.display="flex";
+}
+
+function closeGame(){
+    document.querySelectorAll(".game")
+    .forEach(g=>g.style.display="none");
+}
+
+/* HANGMAN */
+const secret="🍎🍌🍇";
+let guessed=[];
+
+function guess(){
+    let v=document.getElementById("letter").value;
+    guessed.push(v);
+
+    document.getElementById("word").innerHTML=
+    secret.split("").map(c=>guessed.includes(c)?c:"❓").join(" ");
+}
+
+/* WORDLE */
+const target=["🍎","🍌","🍇","🍓","🍉"];
+
+function checkWord(){
+    let g=document.getElementById("guessWord").value.split("");
+    let row=document.createElement("div");
+
+    for(let i=0;i<5;i++){
+        let s=document.createElement("span");
+        s.innerHTML=g[i]||"❓";
+        s.style.fontSize="28px";
+        s.style.padding="8px";
+
+        if(g[i]===target[i]) s.style.background="green";
+        else if(target.includes(g[i])) s.style.background="gold";
+        else s.style.background="gray";
+
+        row.appendChild(s);
+    }
+
+    document.getElementById("wordleGrid").appendChild(row);
+}
+
+/* TIC TAC TOE */
+let board=["","","","","","","","",""];
+let turn="❌";
+const ttt=document.getElementById("tttBoard");
+
+function draw(){
+    ttt.innerHTML="";
+    board.forEach((v,i)=>{
+        const c=document.createElement("div");
+        c.className="cell";
+        c.innerHTML=v;
+
+        c.onclick=()=>{
+            if(v===""){
+                board[i]=turn;
+                turn = turn==="❌" ? "⭕" : "❌";
+                draw();
+            }
+        };
+
+        ttt.appendChild(c);
+    });
+}
+
+draw();
+
+/* COOKIE CLICKER */
+let cookies=0;
+
+function addCookie(){
+    cookies++;
+    document.getElementById("count").innerText=cookies+" 🍪";
+}
+
+</script>
+
+</body>
+</html>
