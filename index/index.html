@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMOJI HUB</title>
+
+<style>
+*{
+    cursor:none !important;
+}
+
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    overflow:hidden;
+}
+
+/* EMOJI BAR */
+#emojiBar{
+    position:fixed;
+    top:0;
+    width:100%;
+    background:#003cff;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:6px;
+}
+
+/* EMOJI BUTTONS */
+.emoji-btn{
+    background:white;
+    border:none;
+    padding:6px 8px;
+    font-size:18px;
+    border-radius:6px;
+}
+
+/* CURSOR */
+#cursor{
+    position:fixed;
+    pointer-events:none;
+    font-size:24px;
+    transform:translate(-50%,-50%);
+    z-index:999999;
+}
+
+/* GAME LINK */
+a{
+    display:inline-block;
+    margin-top:180px;
+    padding:25px 40px;
+    background:#00aaff;
+    color:white;
+    text-decoration:none;
+    font-size:28px;
+    border-radius:15px;
+    font-weight:bold;
+}
+
+a:hover{
+    background:#0088cc;
+    transform:scale(1.05);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- EMOJIS -->
+<div id="emojiBar"></div>
+
+<!-- CURSOR -->
+<div id="cursor">😀</div>
+
+<!-- GAME LINK -->
+<a href="terity.html">
+territory wars
+</a>
+
+<script>
+
+/* ======================
+   50 EMOJIS TOTAL
+   (20 + 30 EXTRA)
+====================== */
+
+const emojis=[
+"😀","😎","🔥","⚡","💎",
+"🎮","🚀","👑","🐱","🦄",
+"🍕","🌈","🎉","💥","🐸",
+"🧠","👾","🎲","🌀","💙",
+
+// +30 MORE
+"🤖","👻","💀","🐙","🦈",
+"🐉","🦊","🐼","🐵","🐔",
+"🍔","🍟","🌭","🍩","🍪",
+"🍫","🍓","🍇","🍉","⚽",
+"🏀","🏈","🎾","🎧","🎤",
+"🚗","🛸","🌍","🌙","🧊"
+];
+
+let currentEmoji="😀";
+
+const bar=document.getElementById("emojiBar");
+
+emojis.forEach(e=>{
+    const b=document.createElement("button");
+    b.className="emoji-btn";
+    b.innerHTML=e;
+    b.onclick=()=>currentEmoji=e;
+    bar.appendChild(b);
+});
+
+/* CURSOR FOLLOW */
+document.addEventListener("mousemove",(e)=>{
+    const c=document.getElementById("cursor");
+    c.innerHTML=currentEmoji;
+    c.style.left=e.clientX+"px";
+    c.style.top=e.clientY+"px";
+});
+
+</script>
+
+</body>
+</html>
